@@ -1,0 +1,3 @@
+PRDT_NAME;PRDT_EAN_CODE;PRDT_TYPE;PRDT_QTE;PRDT_AMOUNT;SUPPLIER_NAME;SUPPLIER_ADDRESS;PURCHASER_FIRST_NAME;PURCHASER_LAST_NAME;PURCHASER_EMAIL;TRANSACTION_DATE
+USBZEN;EAN10000;USB KEY;8;15,99;Cdiscount;27 Boulevard des Nations Nantes France;Eric;Dupont;ericdupont@yopmail.com;2019-12-15
+CameraZEN;EAN5000;Camera;12;160,57;Cdiscount;27 Boulevard des Nations Nantes France;Samuel;Marimont;samuelmarimont@yopmail.com;2019-12-15

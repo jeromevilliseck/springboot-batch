@@ -1,6 +1,12 @@
 package fr.jervill.springbatch;
 
+import fr.jervill.springbatch.batchutils.BatchJobListener;
+import fr.jervill.springbatch.batchutils.BatchStepSkipper;
+import fr.jervill.springbatch.dto.ConvertedInputData;
 import fr.jervill.springbatch.dto.InputData;
+import fr.jervill.springbatch.processor.BatchProcessor;
+import fr.jervill.springbatch.reader.BatchReader;
+import fr.jervill.springbatch.writer.BatchWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -26,7 +32,7 @@ public class SpringbatchformationApplication {
 		SpringApplication.run(SpringbatchformationApplication.class, args);
 	}
 
-	@Value("{path.to.the.work.dir}")
+	@Value("${working.directory}")
 	private String workDirPath;
 
 	@Autowired
@@ -93,7 +99,7 @@ public class SpringbatchformationApplication {
 	 */
 	public Step batchStep(){
 		return stepBuilderFactory.get("stepDatawarehouseLoader").transactionManager(transactionManager)
-				.<InputData, ConvertInputData>chunk(1).reader(batchReader()).processor(batchProcessor())
+				.<InputData, ConvertedInputData>chunk(1).reader(batchReader()).processor(batchProcessor())
 				.writer(batchWriter()).faultTolerant().skipPolicy(batchStepSkipper()).build();
 	}
 

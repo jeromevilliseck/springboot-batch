@@ -1,6 +1,7 @@
 package fr.jervill.springbatch.reader;
 
 import fr.jervill.springbatch.dto.InputData;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -14,15 +15,29 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.validation.BindException;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class BatchReader extends MultiResourceItemReader<InputData> {
-    Logger log = LoggerFactory.getLogger(BatchReader.class);
+    Logger logger = LoggerFactory.getLogger(BatchReader.class);
 
     public BatchReader(String workDirPath){
-        log.info("Batch reader starting to read input data in repository : " + workDirPath);
+        //To know which folder is processed
+        File inputDir = new File(workDirPath);
+        logger.info("Path to process : " + inputDir.getAbsolutePath());
+
+        List<String> result = new ArrayList<>();
+        this.search(".*\\.csv", inputDir, result);
+        logger.info("Files to process : ");
+        for (String s : result) {
+            logger.info(s.substring(s.lastIndexOf("/") + 1)); //UNIX
+            //logger.info(s.substring(s.lastIndexOf("\\")+1)); //WINDOWS
+        }
+
+        logger.info("Batch reader starting to read input data in repository : " + workDirPath);
         this.setResources(getInputResources(workDirPath));
         this.setDelegate(readOneFile());
     }
@@ -40,7 +55,7 @@ public class BatchReader extends MultiResourceItemReader<InputData> {
 
         List<FileSystemResource> inputResources = filesList.stream().filter(
                 file -> file != null && file.isFile())
-                .peek(file -> log.info("Reading file : " + file.getAbsolutePath()))
+                .peek(file -> logger.info("Reading file : " + file.getAbsolutePath()))
                 .map(file -> new FileSystemResource(file))
                 .collect(Collectors.toList());
 
@@ -94,5 +109,21 @@ public class BatchReader extends MultiResourceItemReader<InputData> {
         });
 
         return resourceReader;
+    }
+
+    private void search(final String pattern, final File folder, List<String> result) {
+        for (final File f : folder.listFiles()) {
+
+            if (f.isDirectory()) {
+                search(pattern, f, result);
+            }
+
+            if (f.isFile()) {
+                if (f.getName().matches(pattern)) {
+                    result.add(f.getAbsolutePath());
+                }
+            }
+
+        }
     }
 }
